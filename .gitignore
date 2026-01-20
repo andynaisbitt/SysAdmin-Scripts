@@ -1,0 +1,13 @@
+# Gitignore for generated outputs
+
+# Folders for reports and logs
+Output/
+Reports/
+Logs/
+
+# Common generated file types
+*.csv
+*.html
+*.zip
+*.json
+*.log

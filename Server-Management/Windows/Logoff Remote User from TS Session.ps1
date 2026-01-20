@@ -1,26 +1,16 @@
 <#
 .SYNOPSIS
-Logs off a remote user from a terminal server session.
+[DEPRECATED] Logs off a remote user from a terminal server session.
+Please use Logoff-RDPSession.ps1 instead.
 #>
+[CmdletBinding(SupportsShouldProcess = $true)]
 param (
+    [string]$ComputerName,
     [string]$UserName,
-    [string]$ServerListFile = ".\servers.txt"
+    [int]$SessionId
 )
 
-if (-not $UserName) {
-    $UserName = Read-Host "Enter the user name to log off"
-}
+Write-Warning "This script is deprecated. Please use 'Logoff-RDPSession.ps1' instead."
 
-$Servers = Get-Content -Path $ServerListFile -ErrorAction SilentlyContinue
-
-foreach ($Server in $Servers) {
-    try {
-        $Session = Get-RDUserSession -ComputerName $Server | Where-Object { $_.UserName -eq $UserName }
-        if ($Session) {
-            Disconnect-RDUser -HostServer $Server -UnifiedSessionID $Session.UnifiedSessionId -Force
-        }
-    }
-    catch {
-        Write-Warning "Failed to log off user '$UserName' from server '$Server'."
-    }
-}
+# Call the new, standardized script
+& (Join-Path $PSScriptRoot "Logoff-RDPSession.ps1") -ComputerName $ComputerName -UserName $UserName -SessionId $SessionId -Confirm:$Confirm -WhatIf:$WhatIf

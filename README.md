@@ -87,8 +87,7 @@ Health checks and reporting.
 - `Get-CertificateExpiryReport.ps1`
 - `Get-BSODReport.ps1`
 - `Get-BackupHealthUnified.ps1`
-- `5Newestevents.ps1`
-- `Example.ps1`
+
 
 ### Networking
 Network diagnostics + capture helpers.

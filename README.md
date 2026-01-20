@@ -1,226 +1,103 @@
-# 🛠️ SysAdmin PowerShell Toolkit (2026)
+# 🛠️ SysAdmin Toolkit (Windows/Linux)
 
-A practical, modern PowerShell toolkit for **IT Support + Windows System Administration**.  
+A comprehensive, modern PowerShell toolkit for **IT Support + Windows/Linux System Administration**.  
 Built to be **fast to run**, **easy to audit**, and **cleanly organised** — covering identity, endpoints, servers, storage, networking, patching, M365, backups, and security.
 
-> Goal: fewer “random scripts”, more repeatable operations + reporting you can hand to a manager or auditor.
+> Goal: Provide a professional-grade toolkit for daily operations, triage, auditing, and automation.
 
 ---
 
 ## ✅ What’s inside
 
-- **IT Support utilities** (remote triage, BitLocker checks, software inventory, GPUpdate, logged-on user, repairs)
-- **Windows sysadmin ops** (RDP session mgmt, service health, pending reboot, update status, cert expiry)
-- **File server management** (SMB open files, share audits, home drives, share creation)
-- **Identity & access** (stale AD users/computers, privileged group audits, onboarding by template coming soon)
-- **Backups** (Veeam/BE + restore readiness)
-- **Networking** (port/process mapping, snapshots, SMB connections, port matrix, packet capture helpers)
-- **Storage & quotas** (FSRM quota reporting + CSV-driven quotas)
-- **Security** (Defender, LAPS, audit baseline, local admin reporting, RDP exposure)
+- **IT Support & Desktop Management** (remote triage, BitLocker, software inventory, GPUpdate, logged-on users, repairs, user profile reset, printer re-add, network reset)
+- **Windows Server Operations** (uptime, reboot history, role inventory, event log grabbing, RDP session management, process control, server triage)
+- **File Server Management** (SMB open files/sessions, share audits, permissions effective view, home drives, share creation, migration, risk summary, largest folders)
+- **Identity & Access (AD DS, DHCP, DNS)** (stale AD users/computers, privileged group audits, comprehensive user onboarding/offboarding, bulk group/user-to-group management, user OU movement, password reset, DNS issue resolution, duplicate DNS records, DHCP lease management, stale DHCP reservations)
+- **Backups & Restore Readiness** (Veeam/Backup Exec integration, unified backup health report, restore readiness testing, Robocopy wrappers, restore evidence packs)
+- **Networking** (port/process mapping, listening ports, network snapshots, SMB connections, port matrix testing, packet capture helpers, suspicious listeners, top remote endpoints)
+- **Storage & Quotas (FSRM)** (FSRM quota reporting + CSV-driven quotas)
+- **Security & Compliance** (Defender status, LAPS status, audit policy baselines, RDP exposure, local firewall, hardening snapshots/drift, admin shares exposure)
+- **Patch Management** (WSUS operations, declined updates, cleanup, client status, Windows Update status, pending reboot reports across estate)
+- **Office 365 / Entra ID** (message trace, user reports, MFA status, licensing drift, shared mailbox access audit/grant, comprehensive user offboarding)
+- **Toolbox:** Managed downloads for essential external tools (Sysinternals, tcping, psping).
+- **Core Utilities:** Foundational scripts for consistent logging, standardized report export, flexible target retrieval, and remoting readiness checks.
 
 ---
 
-## 📁 Folder map (current)
+## 🚀 Quick Start
 
-### Azure
-Azure-related scripts and helpers (growing).
+To quickly get a feel for the toolkit, try these commands:
 
-### Backup
-Backup health checks and restore readiness.
-- `Get-BackupHealth.ps1`
-- `Test-RestoreReadiness.ps1`
-- `Backup\\Backup-Exec\\Get-BEJobHistory.ps1`
-- `Backup\\Veeam\\Get-VeeamJobStatus.ps1`
-- `Backup\\RoboCopy\\Start-Robocopy.ps1`
-- `Backup\\RoboCopy\\Start-Robocopy-Backup.ps1`
-- `Backup\\RoboCopy\\Start-Robocopy-Mirror.ps1`
+### Workstation Triage
+```powershell
+.\Desktop-Management\Triage\Invoke-WorkstationTriage.ps1 -ComputerName "WORKSTATION01" -DestinationPath "C:\TriageReports"
+```
 
-### Desktop-Management
-Common IT Support / endpoint operations.
-- `Get-LoggedOnUser.ps1`
-- `Get-RemoteNetworkDrives.ps1`
-- `Invoke-RemoteGPUpdate.ps1`
-- `Invoke-RemoteBitLockerStatus.ps1`
-- `Invoke-RemoteRepair.ps1`
-- `Invoke-RemoteSoftwareInventory.ps1`
-- `Get-LocalAdminDriftReport.ps1`
-- `Desktop-Management\\Local-GPO\\SetLocalPWPolicy.ps1`
+### Check Print Queue Health
+```powershell
+.\Print-Server-Management\Get-PrintServerQueueHealth.ps1 -ComputerName "PRINTSRV01" | Format-Table -AutoSize
+```
 
-### Discovery
-Network / device discovery.
-- `Get-NetworkDevice.ps1`
-
-### File-Server-Management
-File server ops + audits (SMB, shares, home drives).
-- `Get-SmbOpenFilesReport.ps1`
-- `Close-SmbOpenFile.ps1`
-- `Get-SharePermissionsAudit.ps1`
-- `New-FileShare.ps1`
-- `Set-HomeDrives.ps1`
-
-### Identity-Access
-Identity + Active Directory operations & reporting.
-
-#### ActiveDirectory (core)
-- `Get-PrivilegedGroupsAudit.ps1`
-- `Get-StaleADComputers.ps1`
-- `Get-StaleADUsers.ps1`
-- `New-ADUserFromTemplate.ps1`
-- `Get-ADGroupMember.ps1`
-- `Enabled Users.ps1`
-- `Disabled Users.ps1`
-
-#### DHCP / DNS / Group Policy
-- `DHCP\\Get-DhcpScopeReport.ps1`
-- `DNS\\Get-DnsZoneReport.ps1`
-- `Group-Policy\\Get-GPOComplianceReport.ps1`
-
-### ITSM-Tools
-Integrations / tools for service management platforms.
-- `ManageEngine\\SelfScan_Deployment.ps1`
-- `ManageEngine\\importschedule.xml`
-
-### Monitoring
-Health checks and reporting.
-- `Get-RecentCriticalEvents.ps1`
-- `Get-ServiceHealthReport.ps1`
-- `Get-CertificateExpiryReport.ps1`
-- `Get-BSODReport.ps1`
-- `Get-BackupHealthUnified.ps1`
-
-
-### Networking
-Network diagnostics + capture helpers.
-
-#### Connections
-- `Get-PortUsage.ps1`
-- `Find-ListeningPorts.ps1`
-- `Find-WhoUsesPort.ps1`
-- `Get-NetstatSnapshot.ps1`
-- `Get-SMBConnections.ps1`
-- `Test-PortMatrix.ps1`
-
-#### Capture
-- `Get-WiresharkInterfaces.ps1`
-- `Start-TsharkCapture.ps1`
-- `Stop-Capture.ps1`
-- `Export-CaptureSummary.ps1`
-
-#### FTP
-- `FTP.ps1`
-
-### Office365
-Microsoft 365 reporting & admin tasks.
-- `Get-MessageTrace.ps1`
-- `Get-O365UserReport.ps1`
-- `Get-MFAStatusReport.ps1`
-- `Get-LicensingDriftReport.ps1`
-- `Get-SharedMailboxAccessAudit.ps1`
-- `Add-UserToSharedMailbox.ps1`
-- `Offboard-User.ps1`
-
-### Patch-Management
-Patch status and WSUS operations.
-- `Get-PendingRebootReport.ps1`
-- `Get-WindowsUpdateStatus.ps1`
-
-#### WSUS
-- `Get-WsusServerReport.ps1`
-- `Invoke-WSUSCleanup.ps1`
-- `Get-WSUSDeclinedUpdatesReport.ps1`
-- `Get-WSUSClientStatusSummary.ps1`
-
-### Print-Server-Management
-Print server essentials.
-- `Get-PrintServerQueueHealth.ps1`
-- `Clear-PrintQueue.ps1`
-- `Restart-PrintSpooler.ps1`
-- `Get-PrinterDriverReport.ps1`
-- `Backup-PrintServerConfig.ps1`
-
-### Security
-Security reporting & hardening checks.
-- `Get-LocalAdminReport.ps1`
-- `Get-DefenderStatusReport.ps1`
-- `Get-LAPSStatus.ps1`
-- `Get-AuditPolicyBaseline.ps1`
-- `Get-RDPExposureReport.ps1`
-
-### Server-Management
-Server-specific scripts.
-
-#### Linux
-- `Get-LinuxSystemInfo.ps1`
-
-#### Windows
-- `Get-WindowsServiceStatus.ps1`
-- `Logoff Remote User from TS Session.ps1`
-
-### Software
-Tooling and portable utilities.
-
-#### Toolbox
-- `Get-Toolbox.ps1`
-- `_manifest.json`
-- `Toolbox\\Windows\\`
-- `Toolbox\\Linux\\`
-
-### Software-Deployment
-Silent installs + remote software management.
-
-#### Packages
-- `Install-7Zip.ps1`
-- `Install-AnyDesk.ps1`
-- `Install-TeamViewer.ps1`
-- `Install-PackageFromUrl.ps1`
-
-#### Remote-Software
-- `Get-InstalledSoftware.ps1`
-- `Find-InstalledSoftware.ps1`
-- `Uninstall-Software.ps1`
-
-#### Roles-And-Features
-- `Enable-NetFx3.ps1`
-
-### Storage
-Storage & quota management.
-
-#### FSRM
-- `Set-FSRMQuotaFromCSV.ps1`
-- `Get-FSRMQuotaHealthReport.ps1`
-
----
-
-## 🚀 Quick examples
-
+### Find Who's Using a Port
 ```powershell
 .\Networking\Connections\Find-WhoUsesPort.ps1 -Port 445
-.\Networking\Connections\Get-NetstatSnapshot.ps1 -Seconds 30 -Interval 2
-.\File-Server-Management\Get-SmbOpenFilesReport.ps1 -ComputerName FS01
-.\Print-Server-Management\Restart-PrintSpooler.ps1 -ComputerName PRINT01
-.\Software-Deployment\Remote-Software\Get-InstalledSoftware.ps1 -ComputerName PC-123
-.\Patch-Management\Get-PendingRebootReport.ps1 -ComputerName SRV01
 ```
+
+### Get Local Administrator Report (on a few machines)
+```powershell
+.\Security\Get-LocalAdminReport.ps1 -ComputerName "PC01", "PC02" | Format-Table -AutoSize
+```
+
+### Get Comprehensive Computer Inventory
+```powershell
+.\Discovery\Get-ComputerInventory.ps1 -AdOuPath "OU=Workstations,DC=yourdomain,DC=com" -ExportPath "C:\Inventory\WorkstationInventory.csv"
+```
+
+---
+
+## ✨ Most Used Commands
+
+Here are some of the most frequently used and powerful commands in the toolkit:
+
+*   **`Invoke-WorkstationTriage.ps1`:** Collects extensive diagnostic data from a workstation.
+*   **`Get-ComputerInventory.ps1`:** Comprehensive hardware/software/security inventory from endpoints.
+*   **`Get-PendingRebootEstateReport.ps1`:** Checks for pending reboots across an entire OU.
+*   **`New-ADUserOnboarding.ps1`:** Automates the complete new user creation process in AD.
+*   **`Offboard-User.ps1`:** Automates user offboarding tasks in M365/Entra ID.
+*   **`Invoke-NetworkResetLite.ps1`:** Quick network troubleshooting for endpoints.
+*   **`Get-LocalAdminEstateReport.ps1`:** Audits local admin group members across the estate against an allowlist.
+*   **`Get-WSUSClientStatusSummary.ps1`:** Summarizes WSUS client update status.
+*   **`Get-CertificateExpiryReport.ps1`:** Monitors certificate expiration across various stores.
+*   **`Invoke-FileShareMigration.ps1`:** A robust Robocopy wrapper for file share migrations.
+
+---
+
+## 📁 Folder Map (Current)
+
+The project is organized into logical top-level directories:
+
+*   **`Azure`**: Scripts related to Azure resource management (planned expansion).
+*   **`Backup`**: Backup health checks, restore readiness, Robocopy wrappers, and evidence generation.
+*   **`Core`**: Foundational scripts for logging, reporting, target management, and remoting checks.
+*   **`Desktop-Management`**: Scripts for managing desktop endpoints, including triage, software inventory, BitLocker, user profiles, and network troubleshooting.
+*   **`Discovery`**: Network and device discovery, and comprehensive inventory collection.
+*   **`File-Server-Management`**: Operations and audits for file servers, including SMB sessions, shares, permissions, and home drives.
+*   **`Identity-Access`**: Management and reporting for Active Directory Domain Services (AD DS), DHCP, and DNS.
+*   **`ITSM-Tools`**: Integrations and tools for service management platforms (e.g., ManageEngine).
+*   **`Monitoring`**: Health checks and reporting for system events, services, and certificates.
+*   **`Networking`**: Network diagnostics, connection analysis, and packet capture helpers.
+*   **`Office365`**: Microsoft 365/Entra ID reporting and administrative tasks.
+*   **`Patch-Management`**: Patch status, WSUS operations, and Windows Update management.
+*   **`Print-Server-Management`**: Print server and client management essentials.
+*   **`Security`**: Security reporting, hardening checks, and compliance auditing.
+*   **`Software-Deployment`**: Silent installs, remote software management, and Windows roles/features.
+*   **`Storage`**: Storage management, FSRM quotas, and disk usage analysis.
 
 ---
 
 ## 🧱 Standards
 
-- Consistent parameters  
-- `-WhatIf` safety  
-- Usable output objects  
-- Evidence-ready logging (WIP)  
-- No hardcoded credentials  
-
----
-
-## 🧩 Roadmap
-
-- Full Joiner–Mover–Leaver automation  
-- Workstation triage pack  
-- Storage + disk space intelligence  
-- Core module for logging + config  
-- Naming + CI standards (PSScriptAnalyzer + Pester)
+For consistency and maintainability, all scripts adhere to the standards defined in `docs/STANDARDS.md`.
 
 ---
 

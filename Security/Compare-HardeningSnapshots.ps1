@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Compares two JSON snapshots of Windows hardening settings and reports any drift.
+Compares two JSON snapshots of Windows hardening settings and reports any drift, including a risk assessment.
 #>
 param (
     [string]$BaselineSnapshotPath,
@@ -34,10 +34,31 @@ try {
         $CurrentValue = $Current.Settings.$PropertyName
 
         if ($BaselineValue -ne $CurrentValue) {
+            $Status = switch ($_.SideIndicator) {
+                "<=" { "Removed" } # Present in baseline, not in current
+                "=>" { "Added" }   # Present in current, not in baseline
+                Default { "Changed" } # Value is different
+            }
+
+            $Risk = "None" # Default risk
+
+            # --- Risk Assessment Logic ---
+            switch ($PropertyName) {
+                "SMBv1ClientEnabled" { if ($CurrentValue -eq $true) { $Risk = "High (SMBv1 Client Enabled)" } }
+                "SMBv1ServerEnabled" { if ($CurrentValue -eq $true) { $Risk = "Critical (SMBv1 Server Enabled)" } }
+                "LLMNREnabled"       { if ($CurrentValue -eq $true) { $Risk = "Medium (LLMNR Enabled)" } }
+                "TLS10ClientEnabled" { if ($CurrentValue -eq $true) { $Risk = "Medium (TLS 1.0 Client Enabled)" } }
+                "TLS10ServerEnabled" { if ($CurrentValue -eq $true) { $Risk = "High (TLS 1.0 Server Enabled)" } }
+                # Add more risk assessments as needed for other settings
+            }
+
+
             [PSCustomObject]@{
-                Setting      = $PropertyName
+                Setting       = $PropertyName
+                Status        = $Status
                 BaselineValue = $BaselineValue
                 CurrentValue  = $CurrentValue
+                Risk          = $Risk
                 ComputerName  = $Current.ComputerName
                 Timestamp     = $Current.Timestamp
             }

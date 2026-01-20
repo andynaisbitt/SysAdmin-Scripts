@@ -5,60 +5,59 @@ Gathers extensive inventory details (hardware, OS, network, security, logged-on 
 param (
     [string[]]$ComputerName,
     [string]$AdOuPath, # Optional: Search an Active Directory OU for computer names
+    [string]$AdFilter = "*", # Optional: AD filter for Get-ADComputer (e.g., 'Name -like "PC*"')
     [string]$ExportPath
 )
 
-if (-not $ComputerName -and -not $AdOuPath) {
-    $ComputerName = Read-Host "Enter a comma-separated list of computer names or an AD OU path"
-    if ($ComputerName -match "^(?:OU|CN)=.*,DC=.*") {
-        $AdOuPath = $ComputerName
-        $ComputerName = $null
-    }
-    else {
-        $ComputerName = $ComputerName.Split(',')
-    }
+# --- Resolve Target Computers ---
+$TargetComputers = @()
+
+if ($ComputerName) {
+    $TargetComputers += $ComputerName
 }
 
 if ($AdOuPath) {
     try {
-        $AdComputers = Get-ADComputer -Filter * -SearchBase $AdOuPath -ErrorAction Stop | Select-Object -ExpandProperty Name
-        $ComputerName = if ($ComputerName) { $ComputerName + $AdComputers } else { $AdComputers }
+        # Using -Filter with the AD filter provided by the user
+        $AdComputers = Get-ADComputer -Filter $AdFilter -SearchBase $AdOuPath -ErrorAction Stop | Select-Object -ExpandProperty Name
+        $TargetComputers += $AdComputers
     }
     catch {
-        Write-Error "Failed to retrieve computers from AD OU '$AdOuPath': $($_.Exception.Message)"
+        Write-Error "Failed to retrieve computers from AD OU '$AdOuPath' with filter '$AdFilter': $($_.Exception.Message)"
         return
     }
 }
-if (-not $ComputerName) {
+if (-not $TargetComputers) {
     Write-Warning "No computer names provided or found."
     return
 }
+$TargetComputers = $TargetComputers | Select-Object -Unique # Ensure unique computer names
 
-$Result = foreach ($Computer in $ComputerName) {
+$Result = foreach ($Computer in $TargetComputers) {
     Write-Verbose "Collecting inventory from $Computer..."
     try {
         Invoke-Command -ComputerName $Computer -ScriptBlock {
             # --- OS Info ---
-            $Os = Get-CimInstance -ClassName Win32_OperatingSystem
-            $Bios = Get-CimInstance -ClassName Win32_BIOS
-            $ComputerSystem = Get-CimInstance -ClassName Win32_ComputerSystem
-            $Processor = Get-CimInstance -ClassName Win32_Processor
-            $Ram = (Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB
-            $Disks = Get-CimInstance -ClassName Win32_LogicalDisk | Select-Object DeviceID, @{N="SizeGB";E={[math]::Round($_.Size / 1GB, 2)}}, @{N="FreeSpaceGB";E={[math]::Round($_.FreeSpace / 1GB, 2)}}
+            $Os = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction SilentlyContinue
+            $Bios = Get-CimInstance -ClassName Win32_BIOS -ErrorAction SilentlyContinue
+            $ComputerSystem = Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction SilentlyContinue
+            $Processor = Get-CimInstance -ClassName Win32_Processor -ErrorAction SilentlyContinue
+            $Ram = (Get-CimInstance -ClassName Win32_PhysicalMemory -ErrorAction SilentlyContinue | Measure-Object -Property Capacity -Sum).Sum / 1GB
+            $Disks = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction SilentlyContinue | Select-Object DeviceID, @{N="SizeGB";E={[math]::Round($_.Size / 1GB, 2)}}, @{N="FreeSpaceGB";E={[math]::Round($_.FreeSpace / 1GB, 2)}}
 
             # --- Network Info ---
-            $IPs = (Get-NetIPAddress | Where-Object { $_.AddressFamily -eq 'IPv4' -and $_.InterfaceAlias -notlike 'Loopback*' }).IPAddress -join ", "
+            $IPs = (Get-NetIPAddress -ErrorAction SilentlyContinue | Where-Object { $_.AddressFamily -eq 'IPv4' -and $_.InterfaceAlias -notlike 'Loopback*' }).IPAddress -join ", "
 
             # --- Logged-on User ---
-            $LoggedOnUser = (Get-CimInstance -ClassName Win32_ComputerSystem).UserName
+            $LoggedOnUser = (Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction SilentlyContinue).UserName
             
-            # --- Pending Reboot ---
+            # --- Pending Reboot (simplified) ---
             $PendingReboot = $false
-            if (Test-Path -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations") { $PendingReboot = $true }
-            if (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired") { $PendingReboot = $true }
+            if (Test-Path -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations" -ErrorAction SilentlyContinue) { $PendingReboot = $true }
+            if (Test-Path -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" -ErrorAction SilentlyContinue) { $PendingReboot = $true }
 
             # --- BitLocker Status ---
-            $BitLocker = Get-BitLockerVolume | Select-Object MountPoint, ProtectionStatus -ErrorAction SilentlyContinue
+            $BitLocker = Get-BitLockerVolume -ErrorAction SilentlyContinue | Select-Object MountPoint, ProtectionStatus
 
             # --- TPM Status ---
             $Tpm = Get-Tpm -ErrorAction SilentlyContinue
@@ -77,7 +76,7 @@ $Result = foreach ($Computer in $ComputerName) {
                 Manufacturer    = $ComputerSystem.Manufacturer
                 SerialNumber    = $Bios.SerialNumber
                 RAMGB           = [math]::Round($Ram, 2)
-                Disks           = ($Disks | ConvertTo-Json -Compress)
+                Disks           = ($Disks | ConvertTo-Json -Compress) # Export as JSON string
                 IPAddresses     = $IPs
                 LoggedOnUser    = $LoggedOnUser
                 LastBootTime    = $Os.LastBootUpTime

@@ -1,6 +1,0 @@
-Copy-Item -Path "C:\Copy\Filtronic Company Overview [2017-01].pptx" -Destination E:\
-Copy-Item -Path "C:\Copy\Filtronic Company Overview [2017-01].pptx" -Destination F:\
-Copy-Item -Path "C:\Copy\Filtronic Company Overview [2017-01].pptx" -Destination G:\
-Copy-Item -Path "C:\Copy\Filtronic Company Overview [2017-01].pptx" -Destination H:\
-Copy-Item -Path "C:\Copy\Filtronic Company Overview [2017-01].pptx" -Destination J:\
-Copy-Item -Path "C:\Copy\Filtronic Company Overview [2017-01].pptx" -Destination i:\

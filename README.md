@@ -1,121 +1,88 @@
 # 🛠️ SysAdmin PowerShell Toolkit
 
-A mixed bag of PowerShell and batch scripts collected over the years while working in system administration.
-
-This isn't a polished product — just real tools that helped fix real problems on real systems (from XP and Server 2003 up to modern Windows and Office 365). Mostly PowerShell, with some batch files where needed.
-
-Use what you need, tweak what you don’t. No guarantees — just useful stuff.
+A curated collection of PowerShell and batch scripts for modern system administration. This toolkit has been reorganized and updated for 2026, providing a clean, logical structure for managing various aspects of your IT infrastructure.
 
 ---
 
 ## 📁 Folder Breakdown
 
-### 🔹 AD
-Scripts related to Active Directory:
-- `Disabled Users.ps1` – Lists disabled users in AD.
-- `Enabled Users.ps1` – Lists enabled users in AD.
-- `Get-ADGroupMember.ps1` – Gets members of a specified AD group.
+### 🔹 ActiveDirectory
+Scripts for managing Active Directory.
+- `Disabled Users.ps1` – Lists all disabled user accounts in Active Directory.
+- `Enabled Users.ps1` – Lists all enabled user accounts in Active Directory.
+- `Get-ADGroupMember.ps1` – Retrieves a list of members from a specified Active Directory group.
 
 ---
 
-### 🔹 BackupExec (📦 Archive-Worthy)
-Old Symantec Backup Exec tool:
-- `Get-BEJobHistory.ps1` – Pulls job history (archived for reference).
+### 🔹 Backup
+Scripts for managing backups.
+- `Get-BEJobHistory.ps1` – Retrieves the job history from Backup Exec.
 
 ---
 
-### 🔹 DISM
-For enabling .NET on older systems:
-- `DISMenableNET35.bat` – Enables .NET Framework 3.5 using DISM.
+### 🔹 Desktop
+Scripts for managing desktop environments.
+- `CheckUsers(QWINSTA).bat` – Displays logged-in users on a terminal server.
+- `Get-RemoteNetworkDrives.ps1` – Shows mapped network drives on a remote computer.
+- `remote_GPUPDATE.bat` – Forces a remote Group Policy update on a computer.
 
 ---
 
-### 🔹 DesktopManagement
-Older tools for managing desktops (XP/2003 days included):
-- `CheckUsers(QWINSTA).bat` – Show logged-in users via Terminal Services.
-- `remote_GPUPDATE.bat` – Push a remote Group Policy update.
-- `RemoveGames.bat` – Script to remove Windows XP games.
-- `Get-Services(SCQuery).bat` – Quick service check on Windows Server 2003.
-- `Get-RemoteNetworkDrives.ps1` – Shows mapped drives on a remote machine.
+### 🔹 Deployment
+Scripts for software and system deployment.
+- `enableNET35.bat` – Enables .NET Framework 3.5 on Windows using DISM.
+- `importschedule.xml` – An example XML file for use with ManageEngine.
+- `SelfScan_Deployment.ps1` – A script for deploying the ManageEngine Self-Scan utility.
 
 ---
 
-### 🔹 EventVWR
-Simple event viewer tools:
-- `5NewestEvents.ps1` – Get the 5 most recent events from a specific log.
-
----
-
-### 🔹 FileManagement
-Copying tools:
-- `Copy Folder contents` – Self-explanatory.
-- `Copy file to Drives` – Handy for pushing a file to multiple drives.
-
----
-
-### 🔹 GroupPolicy
-Group Policy-related scripts:
-- `SetLocalPWPolicy.ps1` – Set a local password policy via PowerShell.
-
----
-
-### 🔹 ManageEngine
-Used with ManageEngine software:
-- `SelfScan_Deployment.ps1` – Tool for deploying the Self-Scan utility.
+### 🔹 Monitoring
+Scripts for system monitoring and health checks.
+- `5Newestevents.ps1` – Retrieves the five newest events from a specified event log.
+- `Example.ps1` – An example script for performing server health checks.
 
 ---
 
 ### 🔹 Networking
-Network diagnostics:
-- `Test-Connection.ps1` – Simple ping tool.
-- `FTP.ps1` – FTP file upload/download automation.
-  > Requires editing `$ftp`, `$user`, `$pass`  
-  > Currently set to *download* from FTP.
+Scripts for network diagnostics and management.
+- `Test-Connection.ps1` – A simple script to test network connectivity to one or more computers.
+- `FTP.ps1` – A script for automating FTP file transfers.
+  > **Note:** Requires editing the script to include the FTP server, username, and password.
 
 ---
 
 ### 🔹 Office365
-Cloud email tools:
-- `Get-MessageTrace.ps1` – Message trace tool for O365 email delivery.
+Scripts for managing Microsoft Office 365.
+- `Get-MessageTrace.ps1` – Traces email messages in Office 365.
 
 ---
 
-### 🔹 Remote Desktop Services
-Remote session management:
-- `Logoff Remote User from TS Session.ps1` – Kill remote TS/RDS user sessions.
+### 🔹 Security
+Scripts for managing system security.
+- `SetLocalPWPolicy.ps1` – Sets the local password policy on a computer.
 
 ---
 
-### 🔹 Server Health Check
-General server check templates:
-- `Example1.ps1` – Base script for health checks (edit to match your needs).
+### 🔹 Server
+Scripts for managing servers.
+- `Logoff Remote User from TS Session.ps1` – Logs off a user from a remote desktop session.
 
 ---
 
 ### 🔹 WSUS
-Windows Server Update Services:
-- `Server_Report.ps1` – Pulls basic WSUS reporting (details vary).
+Scripts for managing Windows Server Update Services (WSUS).
+- `Server_Report.PS1` – Generates a report of WSUS server activity.
 
 ---
 
 ## ⚙️ Usage
 
-- These scripts are meant to be run manually or scheduled as needed.
-- Some may require admin privileges.
-- Many are written for on-prem environments or legacy systems.
-
-> 🧠 Always review a script before running — a few assume certain environments or folder structures.
-
----
-
-## 📎 Notes
-
-- Some batch files are from XP/2003 days — kept for reference or specific edge cases.
-- Most scripts have little to no logging — just output to the console.
-- Feel free to clean up, modernize, or fork into a more structured toolkit.
+- The scripts in this toolkit are designed to be run manually or as scheduled tasks.
+- Many of the scripts require administrative privileges to run correctly.
+- Please review each script before use to ensure it is compatible with your environment.
 
 ---
 
 ## 🧾 License
 
-Use at your own risk. Provided as-is under the MIT License.
+This project is licensed under the MIT License. Use at your own risk.
